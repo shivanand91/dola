@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -45,13 +46,13 @@ const Libraries = () => {
   const [searchQuery, setSearchQuery] = useState("");
   
   // Get location from URL params if available
-  useState(() => {
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const locationParam = params.get('location');
     if (locationParam) {
       setLocation(locationParam);
     }
-  });
+  }, []);
 
   // Filter libraries based on search query
   const filteredLibraries = librariesData.filter(library => 
@@ -137,10 +138,12 @@ const Libraries = () => {
                       <span className="text-dola-primary text-sm font-medium">
                         {library.distance} away
                       </span>
-                      <Button size="sm" className="bg-dola-primary hover:bg-dola-primary/90">
-                        <BookOpen className="mr-1 h-4 w-4" />
-                        View Details
-                      </Button>
+                      <Link to={`/libraries/${library.id}`}>
+                        <Button size="sm" className="bg-dola-primary hover:bg-dola-primary/90">
+                          <BookOpen className="mr-1 h-4 w-4" />
+                          View Details
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </Card>

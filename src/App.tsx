@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Libraries from "./pages/Libraries";
+import LibraryDetail from "./pages/LibraryDetail";
 import Card from "./pages/Card";
 import History from "./pages/History";
 import About from "./pages/About";
@@ -35,6 +36,7 @@ const App = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/libraries" element={<Libraries />} />
+              <Route path="/libraries/:id" element={<LibraryDetail />} />
               <Route path="/card" element={<Card />} />
               <Route path="/history" element={<History />} />
               <Route path="/about" element={<About />} />
