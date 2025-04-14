@@ -1,10 +1,10 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 import { 
   AlertCircle, 
   CheckCircle2, 
@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 const RegisterForm = () => {
-  const { toast } = useToast();
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -85,24 +86,9 @@ const RegisterForm = () => {
     setIsLoading(true);
     
     try {
-      // Here we would make an API call to register the user
-      // For now, we'll simulate a successful registration
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      // Show success toast and move to OTP verification
-      toast({
-        title: "Verification code sent",
-        description: "Please check your email for the verification code.",
-        variant: "default",
-      });
-      
+      // In a real app, we would send the verification code to the user's email
+      // For this demo, we'll simulate this step
       setIsOtpSent(true);
-    } catch (error) {
-      toast({
-        title: "Registration failed",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
@@ -119,24 +105,17 @@ const RegisterForm = () => {
     setIsLoading(true);
     
     try {
-      // Here we would make an API call to verify the OTP
-      // For now, we'll simulate a successful verification
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Registration successful!",
-        description: "Your account has been created successfully.",
-        variant: "default",
+      // Register the user
+      const success = await register({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
       });
       
-      // Redirect to login or dashboard
-      window.location.href = "/login";
-    } catch (error) {
-      toast({
-        title: "Verification failed",
-        description: "The code you entered is incorrect. Please try again.",
-        variant: "destructive",
-      });
+      if (success) {
+        navigate('/login');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -343,11 +322,7 @@ const RegisterForm = () => {
                 variant="link" 
                 className="text-dola-primary font-medium hover:underline"
                 onClick={() => {
-                  toast({
-                    title: "Code resent",
-                    description: "A new verification code has been sent to your email.",
-                    variant: "default",
-                  });
+                  // Do nothing for now, in a real app we would resend the code
                 }}
               >
                 Resend Code

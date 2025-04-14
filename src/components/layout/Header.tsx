@@ -1,7 +1,8 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 import {
   User,
   LogIn,
@@ -17,15 +18,11 @@ import {
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This would be replaced with actual auth state
+  const { isAuthenticated, logout, user } = useAuth();
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLogin = () => {
-    // Temporary login toggle for development
-    setIsLoggedIn(!isLoggedIn);
   };
 
   return (
@@ -52,7 +49,7 @@ const Header = () => {
               <span>Find Libraries</span>
             </div>
           </Link>
-          {isLoggedIn && (
+          {isAuthenticated && (
             <>
               <Link to="/card" className="text-gray-700 dark:text-gray-300 hover:text-dola-primary dark:hover:text-dola-primary transition-colors">
                 <div className="flex items-center space-x-1">
@@ -71,12 +68,12 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center space-x-4">
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <div className="hidden md:flex items-center space-x-4">
               <Button 
                 variant="ghost" 
                 className="flex items-center space-x-2"
-                onClick={() => handleLogin()}
+                onClick={logout}
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
@@ -95,10 +92,7 @@ const Header = () => {
                 </Button>
               </Link>
               <Link to="/login">
-                <Button 
-                  className="bg-dola-primary hover:bg-dola-primary/90" 
-                  onClick={handleLogin}
-                >
+                <Button className="bg-dola-primary hover:bg-dola-primary/90">
                   <LogIn className="mr-2 h-4 w-4" /> Login
                 </Button>
               </Link>
@@ -135,7 +129,7 @@ const Header = () => {
               <Search className="h-5 w-5 text-dola-primary" />
               <span>Find Libraries</span>
             </Link>
-            {isLoggedIn && (
+            {isAuthenticated && (
               <>
                 <Link 
                   to="/card" 
@@ -164,7 +158,7 @@ const Header = () => {
                 <button 
                   className="flex w-full items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                   onClick={() => {
-                    handleLogin();
+                    logout();
                     toggleMenu();
                   }}
                 >
@@ -173,7 +167,7 @@ const Header = () => {
                 </button>
               </>
             )}
-            {!isLoggedIn && (
+            {!isAuthenticated && (
               <div className="flex flex-col space-y-2 pt-2 border-t border-gray-200 dark:border-gray-800">
                 <Link 
                   to="/register" 
@@ -187,10 +181,7 @@ const Header = () => {
                 <Link 
                   to="/login" 
                   className="w-full"
-                  onClick={() => {
-                    handleLogin();
-                    toggleMenu();
-                  }}
+                  onClick={toggleMenu}
                 >
                   <Button className="w-full bg-dola-primary hover:bg-dola-primary/90">
                     <LogIn className="mr-2 h-4 w-4" /> Login

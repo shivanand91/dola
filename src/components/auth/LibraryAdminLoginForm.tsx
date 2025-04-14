@@ -4,11 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, Loader2, Mail, Lock } from "lucide-react";
 
-const LoginForm = () => {
-  const { login } = useAuth();
+const LibraryAdminLoginForm = () => {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -57,10 +57,49 @@ const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const success = await login(formData.email, formData.password);
-      if (success) {
-        navigate('/');
+      // Here we would make an API call to authenticate the library admin
+      // Using our MongoDB credentials
+      const response = await fetch('http://localhost:8000/api/v1/library-admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        toast({
+          title: "Login failed",
+          description: data.message || "Invalid email or password",
+          variant: "destructive",
+        });
+        return;
       }
+
+      // Save auth data
+      localStorage.setItem('libraryAdminToken', data.accessToken);
+      localStorage.setItem('libraryAdmin', JSON.stringify(data.user));
+      
+      toast({
+        title: "Login successful",
+        description: "Welcome to your Library Admin Dashboard",
+        variant: "default",
+      });
+      
+      // Redirect to admin dashboard
+      navigate('/library-admin/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -69,9 +108,9 @@ const LoginForm = () => {
   return (
     <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg max-w-md w-full">
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold mb-2">Welcome Back</h1>
+        <h1 className="text-2xl font-bold mb-2">Library Admin Login</h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Log in to access your DOLA account
+          Access your library dashboard
         </p>
       </div>
 
@@ -138,7 +177,7 @@ const LoginForm = () => {
                 Logging in...
               </>
             ) : (
-              "Log in"
+              "Log in as Library Admin"
             )}
           </Button>
         </div>
@@ -146,12 +185,12 @@ const LoginForm = () => {
 
       <div className="mt-6 text-center text-sm">
         <p className="text-gray-600 dark:text-gray-400">
-          Don't have an account?{" "}
+          Don't have an admin account?{" "}
           <Link
-            to="/register"
+            to="/library-admin/register"
             className="text-dola-primary font-medium hover:underline"
           >
-            Create Account
+            Register your Library
           </Link>
         </p>
       </div>
@@ -159,4 +198,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default LibraryAdminLoginForm;
